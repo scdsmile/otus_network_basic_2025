@@ -1,1 +1,1 @@
-# otus_network_basic_2025
+# Курс Network Engineer.Basic
