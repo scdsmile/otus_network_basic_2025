@@ -356,28 +356,144 @@
 ### Шаг 4. Назначьте компьютерам статические IPv6-адреса.
 
 Откройте окно Свойства Ethernet для каждого ПК и назначьте адресацию IPv6.
-
-
-
 Убедитесь, что оба компьютера имеют правильную информацию адреса IPv6. Каждый компьютер должен иметь два глобальных адреса IPv6: один статический и один SLACC.
 
-> Примечание.
->
-> При выполнении работы в среде Cisco Packet Tracer установите статический и SLACC адреса на компьютеры последовательно, отразив результаты в отчете
+> **Я не нашёл, как в CPT задать на одном интерфейсе два адреса... При выполнении поверх автонастройки команды  **ipv6config 2001:db8:acad:a::3/64** в настройках сетевой карты переключается на static...**
 
+> PC-A - полученный с помощью SLACC ipv6-адрес:
+> 
+> ![](https://github.com/scdsmile/otus_network_basic_2025/blob/main/labs/lab-04/img/4_PC-A_ipv6_SLAAC.png?raw=true) 
+> 
+> PC-A - задаём статический ipv6-адрес:
+> 
+> ![](https://github.com/scdsmile/otus_network_basic_2025/blob/main/labs/lab-04/img/4_PC-A_ipv6_static.png?raw=true) 
+> 
+> ```
+> C:\>ipconfig
+> 
+> FastEthernet0 Connection:(default port)
+> 
+>    Connection-specific DNS Suffix..: 
+>    Link-local IPv6 Address.........: FE80::2E0:B0FF:FED5:505C
+>    IPv6 Address....................: 2001:DB8:ACAD:1::3
+>    IPv4 Address....................: 0.0.0.0
+>    Subnet Mask.....................: 0.0.0.0
+>    Default Gateway.................: FE80::1
+>                                      0.0.0.0
+> ```
+> 
+> PC-B - полученный с помощью SLACC ipv6-адрес:
+> 
+> ![](https://github.com/scdsmile/otus_network_basic_2025/blob/main/labs/lab-04/img/4_PC-B_ipv6_SLAAC.png?raw=true) 
+> 
+> PC-B - задаём статический ipv6-адрес:
+> 
+> ![](https://github.com/scdsmile/otus_network_basic_2025/blob/main/labs/lab-04/img/4_PC-B_ipv6_static.png?raw=true) 
+> 
+> ```
+> C:\>ipconfig
+> 
+> FastEthernet0 Connection:(default port)
+> 
+>    Connection-specific DNS Suffix..: 
+>    Link-local IPv6 Address.........: FE80::201:97FF:FE29:EA25
+>    IPv6 Address....................: 2001:DB8:ACAD:A::3
+>    IPv4 Address....................: 0.0.0.0
+>    Subnet Mask.....................: 0.0.0.0
+>    Default Gateway.................: FE80::1
+>                                      0.0.0.0
+> ```
 
 
 ## Часть 3. Проверка сквозного подключения
 
 С PC-A отправьте эхо-запрос на FE80::1. Это локальный адрес канала, назначенный G0/1 на R1.
 
+```
+C:\>ping FE80::1
+
+Pinging FE80::1 with 32 bytes of data:
+
+Reply from FE80::1: bytes=32 time<1ms TTL=255
+Reply from FE80::1: bytes=32 time<1ms TTL=255
+Reply from FE80::1: bytes=32 time<1ms TTL=255
+Reply from FE80::1: bytes=32 time<1ms TTL=255
+
+Ping statistics for FE80::1:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 0ms, Maximum = 0ms, Average = 0ms
+
+C:\>
+```
+
+
 Отправьте эхо-запрос на интерфейс управления S1 с PC-A.
+
+> ```
+> C:\>ping 2001:db8:acad:1::b
+> 
+> Pinging 2001:db8:acad:1::b with 32 bytes of data:
+> 
+> Reply from 2001:DB8:ACAD:1::B: bytes=32 time=2011ms TTL=255
+> Reply from 2001:DB8:ACAD:1::B: bytes=32 time<1ms TTL=255
+> Reply from 2001:DB8:ACAD:1::B: bytes=32 time<1ms TTL=255
+> Reply from 2001:DB8:ACAD:1::B: bytes=32 time<1ms TTL=255
+> 
+> Ping statistics for 2001:DB8:ACAD:1::B:
+>     Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
+> Approximate round trip times in milli-seconds:
+>     Minimum = 0ms, Maximum = 2011ms, Average = 502ms
+> ```
 
 Введите команду tracert на PC-A, чтобы проверить наличие сквозного подключения к PC-B.
 
+> ```
+> C:\>tracert 2001:db8:acad:a::3
+> 
+> Tracing route to 2001:db8:acad:a::3 over a maximum of 30 hops: 
+> 
+>   1   0 ms      0 ms      0 ms      2001:DB8:ACAD:1::1
+>   2   0 ms      4 ms      0 ms      2001:DB8:ACAD:A::3
+> 
+> Trace complete.
+> ```
+
 С PC-B отправьте эхо-запрос на PC-A.
 
+> ```
+> C:\>ping 2001:db8:acad:1::3
+> 
+> Pinging 2001:db8:acad:1::3 with 32 bytes of data:
+> 
+> Reply from 2001:DB8:ACAD:1::3: bytes=32 time<1ms TTL=127
+> Reply from 2001:DB8:ACAD:1::3: bytes=32 time<1ms TTL=127
+> Reply from 2001:DB8:ACAD:1::3: bytes=32 time<1ms TTL=127
+> Reply from 2001:DB8:ACAD:1::3: bytes=32 time<1ms TTL=127
+> 
+> Ping statistics for 2001:DB8:ACAD:1::3:
+>     Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
+> Approximate round trip times in milli-seconds:
+>     Minimum = 0ms, Maximum = 0ms, Average = 0ms
+> ```
+
 С PC-B отправьте эхо-запрос на локальный адрес канала G0/0 на R1.
+
+> ```
+> C:\>ping fe80::1
+> 
+> Pinging fe80::1 with 32 bytes of data:
+> 
+> Reply from FE80::1: bytes=32 time<1ms TTL=255
+> Reply from FE80::1: bytes=32 time<1ms TTL=255
+> Reply from FE80::1: bytes=32 time<1ms TTL=255
+> Reply from FE80::1: bytes=32 time<1ms TTL=255
+> 
+> Ping statistics for FE80::1:
+>     Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
+> Approximate round trip times in milli-seconds:
+>     Minimum = 0ms, Maximum = 0ms, Average = 0ms
+> ```
 
 > Примечание.
 >
