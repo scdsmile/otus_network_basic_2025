@@ -36,3 +36,45 @@ R1(config)#ip ssh authentication-retries 3
 R1(config)#ip ssh time-out 120
 R1(config)#
 
+
+<------ <Настройка ipv6> ------>
+Press RETURN to get started.
+
+Get out!!!
+
+User Access Verification
+
+Password: 
+
+R1>en
+Password: 
+R1#conf t
+R1(config)#interface GigabitEthernet 0/0/0
+R1(config-if)#ipv6 address fe80::1 link-local
+R1(config-if)#no shutdown 
+R1(config-if)#exit
+R1(config)#interface GigabitEthernet 0/0/1
+R1(config-if)#ipv6 address fe80::1 link-local
+R1(config-if)#no shutdown
+R1(config-if)#end
+R1#
+%SYS-5-CONFIG_I: Configured from console by console
+
+R1#show ipv6 inter
+R1#show ipv6 interface br
+GigabitEthernet0/0/0       [up/up]
+    FE80::1
+GigabitEthernet0/0/1       [up/up]
+    FE80::1
+GigabitEthernet0/0/2       [administratively down/down]
+    unassigned
+Vlan1                      [administratively down/down]
+    unassigned
+R1#
+
+
+
+
+R1(config-if)#ipv6 address 2001:db8:acad:a::1/64
+
+R1(config-if)#ipv6 address 2001:db8:acad:1::1/64
