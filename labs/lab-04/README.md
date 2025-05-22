@@ -15,121 +15,121 @@
 
 Назначьте имя хоста и настройте основные параметры устройства.
 
-```
-<------ <Базовая настройка> ------>
-Switch>
-Switch>en
-Switch#conf t
-Enter configuration commands, one per line.  End with CNTL/Z.
-Switch(config)#hostname S1
-S1(config)#service password-encryption 
-S1(config)#enable secret class
-S1(config)#banner motd #Get out!!!#
-S1(config)#no ip domain-lookup
-S1(config)#line con 0
-S1(config-line)#password cisco
-S1(config-line)#logging synchronous 
-S1(config-line)#login
-S1(config-line)#exit
-S1(config)#line vty 0 4
-S1(config-line)#password cisco
-S1(config-line)#login
-S1(config-line)#exit
-S1(config)#
-S1(config)#ip domain-name sw1
-S1(config)#crypto key generate rsa
-The name for the keys will be: S1.sw1
-Choose the size of the key modulus in the range of 360 to 2048 for your
-  General Purpose Keys. Choosing a key modulus greater than 512 may take
-  a few minutes.
-
-How many bits in the modulus [512]: 2048
-% Generating 2048 bit RSA keys, keys will be non-exportable...[OK]
-
-
-<------ <Настройка ssh> ------>
-S1(config)#line vty 0 4
-*Mar 1 0:17:56.272: %SSH-5-ENABLED: SSH 1.99 has been enabled
-S1(config-line)#transport input ssh 
-S1(config-line)#login local
-S1(config-line)#exit
-S1(config)#ip ssh version 2
-S1(config)#ip ssh authentication-retries 3
-S1(config)#ip ssh time-out 120
-
-
-<------ <Настройка SDM> ------>
-S1(config)#sdm prefer dual-ipv4-and-ipv6 default 
-Changes to the running SDM preferences have been stored, but cannot take effect until the next reload.
-Use 'show sdm prefer' to see what SDM preference is currently active.
-S1(config)#do write memory
-Building configuration...
-[OK]
-S1(config)#do reload
-
-<------ <omitted> ------>
-
-Press RETURN to get started!
-
-Get out!!!
-
-User Access Verification
-
-Password: 
-
-S1>en
-Password: 
-S1#show sdm prefer 
- The current template is "dual-ipv4-and-ipv6 default" template.
- 
-<------ <omitted> ------>
-
-S1#
-```
+> ```
+> <------ <Базовая настройка> ------>
+> Switch>
+> Switch>en
+> Switch#conf t
+> Enter configuration commands, one per line.  End with CNTL/Z.
+> Switch(config)#hostname S1
+> S1(config)#service password-encryption 
+> S1(config)#enable secret class
+> S1(config)#banner motd #Get out!!!#
+> S1(config)#no ip domain-lookup
+> S1(config)#line con 0
+> S1(config-line)#password cisco
+> S1(config-line)#logging synchronous 
+> S1(config-line)#login
+> S1(config-line)#exit
+> S1(config)#line vty 0 4
+> S1(config-line)#password cisco
+> S1(config-line)#login
+> S1(config-line)#exit
+> S1(config)#
+> S1(config)#ip domain-name sw1
+> S1(config)#crypto key generate rsa
+> The name for the keys will be: S1.sw1
+> Choose the size of the key modulus in the range of 360 to 2048 for your
+>   General Purpose Keys. Choosing a key modulus greater than 512 may take
+>   a few minutes.
+> 
+> How many bits in the modulus [512]: 2048
+> % Generating 2048 bit RSA keys, keys will be non-exportable...[OK]
+> 
+> 
+> <------ <Настройка ssh> ------>
+> S1(config)#line vty 0 4
+> *Mar 1 0:17:56.272: %SSH-5-ENABLED: SSH 1.99 has been enabled
+> S1(config-line)#transport input ssh 
+> S1(config-line)#login local
+> S1(config-line)#exit
+> S1(config)#ip ssh version 2
+> S1(config)#ip ssh authentication-retries 3
+> S1(config)#ip ssh time-out 120
+> 
+> 
+> <------ <Настройка SDM> ------>
+> S1(config)#sdm prefer dual-ipv4-and-ipv6 default 
+> Changes to the running SDM preferences have been stored, but cannot take effect until the next reload.
+> Use 'show sdm prefer' to see what SDM preference is currently active.
+> S1(config)#do write memory
+> Building configuration...
+> [OK]
+> S1(config)#do reload
+> 
+> <------ <omitted> ------>
+> 
+> Press RETURN to get started!
+> 
+> Get out!!!
+> 
+> User Access Verification
+> 
+> Password: 
+> 
+> S1>en
+> Password: 
+> S1#show sdm prefer 
+>  The current template is "dual-ipv4-and-ipv6 default" template.
+>  
+> <------ <omitted> ------>
+> 
+> S1#
+> ```
 
 ### Шаг 2. Настройте коммутатор.
 
 Назначьте имя хоста и настройте основные параметры устройства.
 
-```
-<------ <Базовая настройка> ------>
-Router>en
-Router#conf t
-Enter configuration commands, one per line.  End with CNTL/Z.
-Router(config)#hostname R1
-R1(config)#service passw
-R1(config)#service password-encryption 
-R1(config)#enable secret class
-R1(config)#banner motd #Get out!!!#
-R1(config)#no ip domain-lookup
-R1(config)#line con 0
-R1(config-line)#password cisco
-R1(config-line)#logging synchronous
-R1(config-line)#login
-R1(config-line)#exit
-R1(config)#ip domain-name Rt1
-R1(config)#crypto key generate rsa
-The name for the keys will be: R1.Rt1
-Choose the size of the key modulus in the range of 360 to 2048 for your
-  General Purpose Keys. Choosing a key modulus greater than 512 may take
-  a few minutes.
-
-How many bits in the modulus [512]: 2048
-% Generating 2048 bit RSA keys, keys will be non-exportable...[OK]
-
-
-<------ <Настройка ssh> ------>
-R1(config)#line vty 0 4
-*Mar 1 0:52:42.204: %SSH-5-ENABLED: SSH 1.99 has been enabled
-
-R1(config-line)#transport input ssh
-R1(config-line)#login local
-R1(config-line)#exit
-R1(config)#ip ssh version 2
-R1(config)#ip ssh authentication-retries 3
-R1(config)#ip ssh time-out 120
-R1(config)#
-```
+> ```
+> <------ <Базовая настройка> ------>
+> Router>en
+> Router#conf t
+> Enter configuration commands, one per line.  End with CNTL/Z.
+> Router(config)#hostname R1
+> R1(config)#service passw
+> R1(config)#service password-encryption 
+> R1(config)#enable secret class
+> R1(config)#banner motd #Get out!!!#
+> R1(config)#no ip domain-lookup
+> R1(config)#line con 0
+> R1(config-line)#password cisco
+> R1(config-line)#logging synchronous
+> R1(config-line)#login
+> R1(config-line)#exit
+> R1(config)#ip domain-name Rt1
+> R1(config)#crypto key generate rsa
+> The name for the keys will be: R1.Rt1
+> Choose the size of the key modulus in the range of 360 to 2048 for your
+>   General Purpose Keys. Choosing a key modulus greater than 512 may take
+>   a few minutes.
+> 
+> How many bits in the modulus [512]: 2048
+> % Generating 2048 bit RSA keys, keys will be non-exportable...[OK]
+> 
+> 
+> <------ <Настройка ssh> ------>
+> R1(config)#line vty 0 4
+> *Mar 1 0:52:42.204: %SSH-5-ENABLED: SSH 1.99 has been enabled
+> 
+> R1(config-line)#transport input ssh
+> R1(config-line)#login local
+> R1(config-line)#exit
+> R1(config)#ip ssh version 2
+> R1(config)#ip ssh authentication-retries 3
+> R1(config)#ip ssh time-out 120
+> R1(config)#
+> ```
 
 
 ## Часть 2. Ручная настройка IPv6-адресов
@@ -138,27 +138,27 @@ R1(config)#
 
 Назначьте глобальные индивидуальные IPv6-адреса, указанные в таблице адресации обоим интерфейсам Ethernet на R1.
 
-```
-Press RETURN to get started.
-
-Get out!!!
-
-User Access Verification
-
-Password: 
-
-R1>en
-Password: 
-R1#conf t
-R1(config)#interface GigabitEthernet 0/0/0
-R1(config-if)#ipv6 address 2001:db8:acad:a::1/64
-R1(config-if)#no shutdown 
-R1(config-if)#exit
-R1(config)#interface GigabitEthernet 0/0/1
-R1(config-if)#ipv6 address 2001:db8:acad:1::1/64
-R1(config-if)#no shutdown
-R1(config-if)#end
-```
+> ```
+> Press RETURN to get started.
+> 
+> Get out!!!
+> 
+> User Access Verification
+> 
+> Password: 
+> 
+> R1>en
+> Password: 
+> R1#conf t
+> R1(config)#interface GigabitEthernet 0/0/0
+> R1(config-if)#ipv6 address 2001:db8:acad:a::1/64
+> R1(config-if)#no shutdown 
+> R1(config-if)#exit
+> R1(config)#interface GigabitEthernet 0/0/1
+> R1(config-if)#ipv6 address 2001:db8:acad:1::1/64
+> R1(config-if)#no shutdown
+> R1(config-if)#end
+> ```
 
 Введите команду **show ipv6 interface brief**, чтобы проверить, назначен ли каждому интерфейсу корректный индивидуальный IPv6-адрес.
 
@@ -166,33 +166,33 @@ R1(config-if)#end
 >
 > Отображаемый локальный адрес канала основан на адресации EUI-64, которая автоматически использует MAC-адрес интерфейса для создания 128-битного локального IPv6-адреса канала.
 
-```
-R1#
-R1#show ipv6 inter
-R1#show ipv6 interface br
-GigabitEthernet0/0/0       [up/up]
-    2001:DB8:ACAD:A::1
-GigabitEthernet0/0/1       [up/up]
-    2001:DB8:ACAD:1::1
-GigabitEthernet0/0/2       [administratively down/down]
-    unassigned
-Vlan1                      [administratively down/down]
-    unassigned
-R1#
-```
+> ```
+> R1#
+> R1#show ipv6 inter
+> R1#show ipv6 interface br
+> GigabitEthernet0/0/0       [up/up]
+>     2001:DB8:ACAD:A::1
+> GigabitEthernet0/0/1       [up/up]
+>     2001:DB8:ACAD:1::1
+> GigabitEthernet0/0/2       [administratively down/down]
+>     unassigned
+> Vlan1                      [administratively down/down]
+>     unassigned
+> R1#
+> ```
 
 Чтобы обеспечить соответствие локальных адресов канала индивидуальному адресу, вручную введите локальные адреса канала на каждом интерфейсе Ethernet на R1.
 
-```
-R1(config)#interface GigabitEthernet 0/0/1
-R1(config-if)#ipv6 address fe80::1 link-local
-R1(config-if)#exit
-R1(config)#interface GigabitEthernet 0/0/0
-R1(config-if)#ipv6 address fe80::1 link-local
-R1(config-if)#end
-R1#
-%SYS-5-CONFIG_I: Configured from console by console
-```
+> ```
+> R1(config)#interface GigabitEthernet 0/0/1
+> R1(config-if)#ipv6 address fe80::1 link-local
+> R1(config-if)#exit
+> R1(config)#interface GigabitEthernet 0/0/0
+> R1(config-if)#ipv6 address fe80::1 link-local
+> R1(config-if)#end
+> R1#
+> %SYS-5-CONFIG_I: Configured from console by console
+> ```
 
 > Примечание.
 >
@@ -200,20 +200,20 @@ R1#
 
 Используйте выбранную команду, чтобы убедиться, что локальный адрес связи изменен на fe80::1.  
 
-```
-R1#show ipv6 interface br
-GigabitEthernet0/0/0       [up/up]
-    FE80::1
-    2001:DB8:ACAD:A::1
-GigabitEthernet0/0/1       [up/up]
-    FE80::1
-    2001:DB8:ACAD:1::1
-GigabitEthernet0/0/2       [administratively down/down]
-    unassigned
-Vlan1                      [administratively down/down]
-    unassigned
-R1#
-```
+> ```
+> R1#show ipv6 interface br
+> GigabitEthernet0/0/0       [up/up]
+>     FE80::1
+>     2001:DB8:ACAD:A::1
+> GigabitEthernet0/0/1       [up/up]
+>     FE80::1
+>     2001:DB8:ACAD:1::1
+> GigabitEthernet0/0/2       [administratively down/down]
+>     unassigned
+> Vlan1                      [administratively down/down]
+>     unassigned
+> R1#
+> ```
 
 > **Вопрос:** *Какие группы многоадресной рассылки назначены интерфейсу G0/0?*
 
@@ -248,21 +248,21 @@ R1#
 
 В командной строке на PC-B введите команду ipconfig, чтобы получить данные IPv6-адреса, назначенного интерфейсу ПК.
 
-```
-Cisco Packet Tracer PC Command Line 1.0
-
-C:\>ipconfig
-
-FastEthernet0 Connection:(default port)
-
-   Connection-specific DNS Suffix..: 
-   Link-local IPv6 Address.........: FE80::201:97FF:FE29:EA25
-   IPv6 Address....................: ::
-   IPv4 Address....................: 0.0.0.0
-   Subnet Mask.....................: 0.0.0.0
-   Default Gateway.................: ::
-                                     0.0.0.0
-```
+> ```
+> Cisco Packet Tracer PC Command Line 1.0
+> 
+> C:\>ipconfig
+> 
+> FastEthernet0 Connection:(default port)
+> 
+>    Connection-specific DNS Suffix..: 
+>    Link-local IPv6 Address.........: FE80::201:97FF:FE29:EA25
+>    IPv6 Address....................: ::
+>    IPv4 Address....................: 0.0.0.0
+>    Subnet Mask.....................: 0.0.0.0
+>    Default Gateway.................: ::
+>                                      0.0.0.0
+> ```
 
 > **Вопрос:** *Назначен ли индивидуальный IPv6-адрес сетевой интерфейсной карте (NIC) на PC-B?*
 
@@ -271,12 +271,12 @@ FastEthernet0 Connection:(default port)
 
 Активируйте IPv6-маршрутизацию на R1 с помощью команды IPv6 unicast-routing.
 
-```
-R1#conf t
-Enter configuration commands, one per line.  End with CNTL/Z.
-R1(config)#ipv6 un
-R1(config)#ipv6 unicast-routing
-```
+> ```
+> R1#conf t
+> Enter configuration commands, one per line.  End with CNTL/Z.
+> R1(config)#ipv6 un
+> R1(config)#ipv6 unicast-routing
+> ```
 
 > Примечание. 
 > 
