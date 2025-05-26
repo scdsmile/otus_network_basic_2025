@@ -16,7 +16,34 @@
 Назначьте имя хоста и настройте основные параметры устройства.
 
 > ```
-> <------ <Базовая настройка> ------>
+> Router>en
+> Router#conf t
+> Enter configuration commands, one per line.  End with CNTL/Z.
+> Router(config)#hostname R1
+> R1(config)#service passw
+> R1(config)#service password-encryption 
+> R1(config)#enable secret class
+> R1(config)#banner motd #Get out!!!#
+> R1(config)#no ip domain-lookup
+> R1(config)#line con 0
+> R1(config-line)#password cisco
+> R1(config-line)#logging synchronous
+> R1(config-line)#login
+> R1(config-line)#exit
+> R1(config)#line vty 0 4
+> R1(config-line)#password cisco
+> R1(config-line)#login
+> R1(config-line)#exit
+> R1(config)#
+> ```
+
+### Шаг 2. Настройте коммутатор.
+
+Назначьте имя хоста и настройте основные параметры устройства.
+
+> Базовая настройка
+>
+> ```
 > Switch>
 > Switch>en
 > Switch#conf t
@@ -36,29 +63,9 @@
 > S1(config-line)#login
 > S1(config-line)#exit
 > S1(config)#
-> S1(config)#ip domain-name sw1
-> S1(config)#crypto key generate rsa
-> The name for the keys will be: S1.sw1
-> Choose the size of the key modulus in the range of 360 to 2048 for your
->   General Purpose Keys. Choosing a key modulus greater than 512 may take
->   a few minutes.
-> 
-> How many bits in the modulus [512]: 2048
-> % Generating 2048 bit RSA keys, keys will be non-exportable...[OK]
-> 
-> 
-> <------ <Настройка ssh> ------>
-> S1(config)#line vty 0 4
-> *Mar 1 0:17:56.272: %SSH-5-ENABLED: SSH 1.99 has been enabled
-> S1(config-line)#transport input ssh 
-> S1(config-line)#login local
-> S1(config-line)#exit
-> S1(config)#ip ssh version 2
-> S1(config)#ip ssh authentication-retries 3
-> S1(config)#ip ssh time-out 120
-> 
-> 
-> <------ <Настройка SDM> ------>
+
+> Настройка SDM для включения ipv6
+>
 > S1(config)#sdm prefer dual-ipv4-and-ipv6 default 
 > Changes to the running SDM preferences have been stored, but cannot take effect until the next reload.
 > Use 'show sdm prefer' to see what SDM preference is currently active.
@@ -84,53 +91,7 @@
 >  
 > <------ <omitted> ------>
 > 
-> S1#
 > ```
-
-### Шаг 2. Настройте коммутатор.
-
-Назначьте имя хоста и настройте основные параметры устройства.
-
-> ```
-> <------ <Базовая настройка> ------>
-> Router>en
-> Router#conf t
-> Enter configuration commands, one per line.  End with CNTL/Z.
-> Router(config)#hostname R1
-> R1(config)#service passw
-> R1(config)#service password-encryption 
-> R1(config)#enable secret class
-> R1(config)#banner motd #Get out!!!#
-> R1(config)#no ip domain-lookup
-> R1(config)#line con 0
-> R1(config-line)#password cisco
-> R1(config-line)#logging synchronous
-> R1(config-line)#login
-> R1(config-line)#exit
-> R1(config)#ip domain-name Rt1
-> R1(config)#crypto key generate rsa
-> The name for the keys will be: R1.Rt1
-> Choose the size of the key modulus in the range of 360 to 2048 for your
->   General Purpose Keys. Choosing a key modulus greater than 512 may take
->   a few minutes.
-> 
-> How many bits in the modulus [512]: 2048
-> % Generating 2048 bit RSA keys, keys will be non-exportable...[OK]
-> 
-> 
-> <------ <Настройка ssh> ------>
-> R1(config)#line vty 0 4
-> *Mar 1 0:52:42.204: %SSH-5-ENABLED: SSH 1.99 has been enabled
-> 
-> R1(config-line)#transport input ssh
-> R1(config-line)#login local
-> R1(config-line)#exit
-> R1(config)#ip ssh version 2
-> R1(config)#ip ssh authentication-retries 3
-> R1(config)#ip ssh time-out 120
-> R1(config)#
-> ```
-
 
 ## Часть 2. Ручная настройка IPv6-адресов
 
@@ -306,8 +267,8 @@
 > **Вопрос:** *Почему PC-B получил глобальный префикс маршрутизации и идентификатор подсети, которые вы настроили на R1?* 
 
 > **Ответ:** *Потому что при включении **ipv6 unicast-routing**, маршрутизатор отправил на порт **RA-сообщение** (Router Advertisement), в котором содержится идентификатор подсети и префикс маршрутизации.*
-> *Компьютер PC-B получил это сообщение, вытащил из него идентификатор подсети и с помощью механизма EUI-64 "догенерировал" оставшуюся часть ipv6 адреса.*
-> *Также комьпютер получил link-local адрес порта маршрутизатора **FE80::1** и установил его в качестве шлюза по умолчанию. Это всё работа механизма SLAAC.*
+> *Компьютер PC-B получил это сообщение, вытащил из него идентификатор подсети и с помощью механизма EUI-64 сгенерировал оставшуюся часть ipv6 адреса.*
+> *Также комьпютер получил link-local адрес порта маршрутизатора **FE80::1** и установил его в качестве шлюза по умолчанию. Это всё работа SLAAC.*
 
 
 ### Шаг 3. Назначьте IPv6-адреса интерфейсу управления (SVI) на S1.
@@ -495,16 +456,17 @@ C:\>
 >     Minimum = 0ms, Maximum = 0ms, Average = 0ms
 > ```
 
-> Примечание.
->
-> В случае отсутствия сквозного подключения проверьте, правильно ли указаны IPv6-адреса на всех устройствах.
-
 ## Вопросы для повторения
 
 > **Вопрос:** *Почему обоим интерфейсам Ethernet на R1 можно назначить один и тот же локальный адрес канала — FE80::1?*
 
-> **Ответ:** * _ *
+> **Ответ:** *Потому что интерфейсы маршрутизатора находится в разных сегментах сети (каналах). Трафик, полученный на этих итерфейсах, не будет маршрутизироваться в другие каналы, поэтому*
+> *устройства, подключенные к интерфейсу G0/0/0 не будут видеть локальный адрес интерфейса G0/0/1 и наоборот.*
+> 
+> **Примечание:**
+> *Проблемы могут возникнуть в том случае, если оба интерфейса коммутатора находятся в одном сегменте сети. Например, подключены в один коммутатор. Но так вообще плохо делать =)*
 
 > **Вопрос:**	*Какой идентификатор подсети в индивидуальном IPv6-адресе 2001:db8:acad::aaaa:1234/64?*
 
-> **Ответ:** * _ *
+> **Ответ:** *Адрес 2001:db8:acad::aaaa:1234/64 имеет сетевой префикс /64, глобальный префикс занимает 48 бит, это первые 3 сегмента, значит идентификатор подсети это (64-48=16 бит) четвертый сегмент адреса.*
+> *Соответственно, идентификатор подсети: 0000 или просто 0.*
