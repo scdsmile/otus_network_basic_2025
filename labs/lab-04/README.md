@@ -66,6 +66,7 @@
 
 > Настройка SDM для включения ipv6
 >
+> ```
 > S1(config)#sdm prefer dual-ipv4-and-ipv6 default 
 > Changes to the running SDM preferences have been stored, but cannot take effect until the next reload.
 > Use 'show sdm prefer' to see what SDM preference is currently active.
