@@ -175,7 +175,7 @@ b.	Настройте для PC-A шлюз по умолчанию.
 
 a.	Задайте имя устройства.
 
-> Аааа, теперь понял, почему мы раньше не указали hostname) Ну ладно, он уже указан, поэтому первый этап пропустим.
+> Аааа, теперь понял, почему мы раньше не указали hostname :) Ну ладно, он уже указан, поэтому первый этап пропустим.
 
 b.	Задайте домен для устройства.
 
@@ -243,7 +243,7 @@ b.	Измените способ входа в систему таким обр�
 
 a.	Запустите Tera Term с PC-A.
 
-> Не буду) Подключусь через командную строку.
+> Не буду :) Подключусь через командную строку.
 
 b.	Установите SSH-подключение к R1. Use the username admin and password Adm1nP@55. У вас должно получиться установить SSH-подключение к R1.
 
@@ -283,6 +283,46 @@ i.	Настройте и активируйте на коммутаторе ин
 
 j.	Сохраните текущую конфигурацию в файл загрузочной конфигурации.
 
+> С вашего позволения, выложу всё одним блоком:
+>
+> ```
+> Switch>en
+> Switch#conf t
+> Enter configuration commands, one per line.  End with CNTL/Z.
+> Switch(config)#no ip domain-l
+> Switch(config)#no ip domain-lookup 
+> Switch(config)#enable pa
+> Switch(config)#enable password class
+> Switch(config)#line vty 0 4
+> Switch(config-line)#pass
+> Switch(config-line)#password cisco
+> Switch(config-line)#login
+> Switch(config-line)#exit
+> Switch(config)#serv
+> Switch(config)#service pa
+> Switch(config)#service password-encryption 
+> Switch(config)#ba
+> Switch(config)#banner m
+> Switch(config)#banner motd #GET OUT!!!#
+> Switch(config)#inte
+> Switch(config)#interface vl
+> Switch(config)#interface vlan 1
+> Switch(config-if)#ip ad
+> Switch(config-if)#ip address 192.168.1.11 255.255.255.0
+> Switch(config-if)#exit
+> Switch(config)#ip de
+> Switch(config)#ip default-gateway 192.168.1.1
+> Switch(config)#exit
+> Switch#
+> %SYS-5-CONFIG_I: Configured from console by console
+> Switch#copy run start
+> Destination filename [startup-config]? 
+> Building configuration...
+> [OK]
+> Switch#
+> Switch#
+> ```
+
 ### Шаг 2. Настройте коммутатор для соединения по протоколу SSH.
 
 Для настройки протокола SSH на коммутаторе используйте те же команды, которые применялись для аналогичной настройки маршрутизатора в части 2.
@@ -299,11 +339,89 @@ e.	Активируйте протоколы Telnet и SSH на линиях VTY
 
 f.	Измените способ входа в систему таким образом, чтобы использовалась проверка пользователей по локальной базе учетных записей.
 
+> Аналогично, одним блоком:
+> 
+> ```
+> Switch#conf t
+> Enter configuration commands, one per line.  End with CNTL/Z.
+> Switch(config)#hostname S1
+> S1(config)#ip domain-n
+> S1(config)#ip domain-name dom
+> S1(config)#cryp
+> S1(config)#crypto k
+> S1(config)#crypto key g
+> S1(config)#crypto key generate rsa
+> The name for the keys will be: S1.dom
+> Choose the size of the key modulus in the range of 360 to 2048 for your
+>   General Purpose Keys. Choosing a key modulus greater than 512 may take
+>   a few minutes.
+> 
+> How many bits in the modulus [512]: 2048
+> % Generating 2048 bit RSA keys, keys will be non-exportable...[OK]
+> 
+> S1(config)#username admin pr
+> *Mar 1 1:9:46.942: %SSH-5-ENABLED: SSH 1.99 has been enabled
+> S1(config)#username admin privilege 15 pass Adm1nP@55
+> S1(config)#line vty 0 4
+> S1(config-line)#tra
+> S1(config-line)#transport i
+> S1(config-line)#transport input ssh
+> S1(config-line)#login local
+> S1(config-line)#?
+> ```
+
 ### Шаг 3. Установите соединение с коммутатором по протоколу SSH.
 
 Запустите программу Tera Term на PC-A, затем установите подключение по протоколу SSH к интерфейсу SVI коммутатора S1.
 
 Вопрос: Удалось ли вам установить SSH-соединение с коммутатором?
+
+> ```
+> C:\>ssh -l admin 192.168.1.11
+> 
+> % Connection timed out; remote host not responding
+> C:\>
+> ```
+> 
+> Не получилось. Раз таймаут при подключении, значит коммутатор банально не ответил на наш запрос. Веоятнее всего, проблема в настройке vlan 1.
+> 
+> ```
+> S1#show interfaces vlan 1
+> Vlan1 is administratively down, line protocol is down
+>   Hardware is CPU Interface, address is 0001.c963.0c9c (bia 0001.c963.0c9c)
+>   Internet address is 192.168.1.11/24
+>   MTU 1500 bytes, BW 100000 Kbit, DLY 1000000 usec,
+>      reliability 255/255, txload 1/255, rxload 1/255
+> ```
+> 
+> ... ну да, так и вышло, "Vlan1 is administratively down", видимо, забыл его включить.
+> 
+> ```
+> S1#conf t
+> Enter configuration commands, one per line.  End with CNTL/Z.
+> S1(config)#interface vlan 1
+> S1(config-if)#no shutdown 
+> 
+> S1(config-if)#
+> %LINK-5-CHANGED: Interface Vlan1, changed state to up
+> 
+> %LINEPROTO-5-UPDOWN: Line protocol on Interface Vlan1, changed state to up
+> ```
+> 
+> Отлично. Теперь пробуем еще раз:
+> 
+> ```
+> C:\>ssh -l admin 192.168.1.11
+> 
+> Password: 
+> 
+> GET OUT!!!
+> 
+> S1#
+> ```
+> 
+> Подключение выполнено!
+
 
 ## Часть 4. Настройка протокола SSH с использованием интерфейса командной строки (CLI) коммутатора
 
