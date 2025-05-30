@@ -40,31 +40,93 @@
 
 Подключите устройства, как показано в топологии, и подсоедините необходимые кабели.
 
-![](https://github.com/scdsmile/otus_network_basic_2025/blob/main/labs/lab-06/img/0_topology.png?raw=true)
+> ![](https://github.com/scdsmile/otus_network_basic_2025/blob/main/labs/lab-06/img/0_topology.png?raw=true)
 
 ### Шаг 2. Настройте базовые параметры для маршрутизатора.
 
 a.	Подключитесь к маршрутизатору с помощью консоли и активируйте привилегированный режим EXEC.
 
+> ```
+> Press RETURN to get started!
+> 
+> 
+> 
+> Router>en
+> ```
+
 b.	Войдите в режим конфигурации.
+
+> ```
+> Router#conf t
+> Enter configuration commands, one per line.  End with CNTL/Z.
+> ```
 
 c.	Назначьте маршрутизатору имя устройства.
 
+> ```
+> Router(config)#hostname R1
+> ```
+
 d.	Отключите поиск DNS, чтобы предотвратить попытки маршрутизатора неверно преобразовывать введенные команды таким образом, как будто они являются именами узлов.
+
+> ```
+> R1(config)#no ip domain-lookup 
+> ```
 
 e.	Назначьте class в качестве зашифрованного пароля привилегированного режима EXEC.
 
+> ```
+> R1(config)#enable secret class
+> ```
+
 f.	Назначьте cisco в качестве пароля консоли и включите вход в систему по паролю.
+
+> ```
+> R1(config)#line con 0
+> R1(config-line)#password cisco
+> R1(config-line)#login
+> ```
 
 g.	Установите cisco в качестве пароля виртуального терминала и активируйте вход.
 
+> ```
+> R1(config-line)#line vty 0 4
+> R1(config-line)#password cisco
+> R1(config-line)#login
+> R1(config-line)#exit
+> ```
+
 h.	Зашифруйте открытые пароли.
+
+> ```
+> R1(config)#service password-encryption
+> ```
 
 i.	Создайте баннер с предупреждением о запрете несанкционированного доступа к устройству.
 
+> ```
+> R1(config)#ban m #GET THE DUCK OUT!!!#
+> ```
+
 j.	Сохраните текущую конфигурацию в файл загрузочной конфигурации.
 
+> ```
+> R1(config)#exit
+> R1#
+> %SYS-5-CONFIG_I: Configured from console by console
+> 
+> R1#copy run st
+> Destination filename [startup-config]? 
+> Building configuration...
+> [OK]
+> R1#
+> ```
+
 k.	Настройте на маршрутизаторе время.
+
+> ```
+> R1#clock set 17:50:00 30 May 2025
+> ```
 
 ### Шаг 3. Настройте базовые параметры каждого коммутатора.
 
@@ -86,10 +148,79 @@ h.	Настройте на коммутаторах время.
 
 i.	Сохранение текущей конфигурации в качестве начальной.
 
+> Конфигурируем коммутатор S1:
+> 
+> ```
+> S1#en
+> S1#conf t
+> Enter configuration commands, one per line.  End with CNTL/Z.
+> S1(config)#hostname S1
+> S1(config)#no ip domain-lookup
+> S1(config)#enable secret class
+> S1(config)#line con 0
+> S1(config-line)#password cisco
+> S1(config-line)#login
+> S1(config-line)#logging synchronous
+> S1(config-line)#exit
+> S1(config)#line vty 0 4
+> S1(config-line)#password cisco
+> S1(config-line)#login
+> S1(config-line)#exit
+> S1(config)#service password-encryption
+> S1(config)#banner motd #GET THE DUCK OUT!!!# 
+> S1(config)#end
+> S1#clock set 17:55:00 30 May 2025
+> S1#copy running-config startup-config
+> Destination filename [startup-config]? 
+> Building configuration...
+> [OK]
+> S1#
+> ```
+> 
+> Аналогичным образом настраиваем коммутатор S2:
+> 
+> ```
+> Switch>
+> Switch>en
+> Switch#conf t
+> Enter configuration commands, one per line.  End with CNTL/Z.
+> Switch(config)#hostname S2
+> S2(config)#no ip domain-lookup
+> S2(config)#enable secret class
+> S2(config)#line con 0
+> S2(config-line)#password cisco
+> S2(config-line)#login
+> S2(config-line)#logging synchronous
+> S2(config-line)#exit
+> S2(config)#line vty 0 4
+> S2(config-line)#password cisco
+> S2(config-line)#login
+> S2(config-line)#exit
+> S2(config)#service password-encryption
+> S2(config)#banner motd #GET THE DUCK OUT!!!# 
+> S2(config)#end
+> S2#clock set 17:59:00 30 May 2025
+> S2#copy running-config startup-config
+> Destination filename [startup-config]? 
+> Building configuration...
+> [OK]
+> S2#
+> ```
+> 
+> **P.S.** Да, я уже сделал себе файлик с базовой конфигурацией коммутатора, поэтому просто ctrl+c + ctrl+v...
+
 
 ### Шаг 4. Настройте узлы ПК.
 
 Адреса ПК можно посмотреть в таблице адресации.
+
+> Конфигурация PC-A:
+>
+> ![](https://github.com/scdsmile/otus_network_basic_2025/blob/main/labs/lab-06/img/1-4_pc-a_ip_config.png?raw=true)
+>
+> Конфигурация PC-B:
+>
+> ![](https://github.com/scdsmile/otus_network_basic_2025/blob/main/labs/lab-06/img/1-4_pc-b_ip_config.png?raw=true)
 
 ## Часть 2. Создание сетей VLAN и назначение портов коммутатора
 

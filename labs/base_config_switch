@@ -1,0 +1,19 @@
+en
+conf t
+hostname S1
+no ip domain-lookup
+enable secret class
+line console 0
+password cisco
+login
+logging synchronous
+exit
+line vty 0 4
+password cisco
+login
+exit
+service password-encryption
+banner motd #GET THE DUCK OUT!!!# 
+end
+clock set 17:59:00 30 May 2025
+copy running-config startup-config
