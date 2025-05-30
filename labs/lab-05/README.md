@@ -9,37 +9,129 @@
 
 Часть 4. SSH через интерфейс командной строки (CLI) коммутатора
 
+## Таблица адресации
+
+| Устройство | Интерфейс | IP-адрес      | Маска подсети      | Шлюз по умолчанию |
+|------------|-----------|---------------|--------------------|-------------------|
+| R1         | G0/0/1    | 192.168.1.1   | 255.255.255.0      | —                |
+| S1         | VLAN 1    | 192.168.1.11  | 255.255.255.0      | 192.168.1.1      |
+| PC-A       | NIC       | 192.168.1.3   | 255.255.255.0      | 192.168.1.1      |
+
 ## Часть 1. Настройка основных параметров устройств
 
 В части 1 потребуется настроить топологию сети и основные параметры, такие как IP-адреса интерфейсов, доступ к устройствам и пароли на маршрутизаторе.
 
 ### Шаг 1. Создайте сеть согласно топологии.
 
+> ![](https://github.com/scdsmile/otus_network_basic_2025/blob/main/labs/lab-05/img/0_topology.png?raw=true)
+
 ### Шаг 2. Выполните инициализацию и перезагрузку маршрутизатора и коммутатора.
+
+> ![](https://github.com/scdsmile/otus_network_basic_2025/blob/main/labs/lab-05/img/1-2_reload.png?raw=true)
 
 ### Шаг 3. Настройте маршрутизатор.
 
-Откройте окно конфигурации
-
 a.	Подключитесь к маршрутизатору с помощью консоли и активируйте привилегированный режим EXEC.
+
+> ```
+> Press RETURN to get started!
+> 
+> Router>en
+> Router#
+> ```
 
 b.	Войдите в режим конфигурации.
 
+> ```
+> Router#conf t
+> Enter configuration commands, one per line.  End with CNTL/Z.
+> Router(config)#
+> ```
+
 c.	Отключите поиск DNS, чтобы предотвратить попытки маршрутизатора неверно преобразовывать введенные команды таким образом, как будто они являются именами узлов.
+
+> ```
+> Router(config)#no ip domain-lookup
+> Router(config)#
+> ```
 
 d.	Назначьте class в качестве зашифрованного пароля привилегированного режима EXEC.
 
+> ```
+> Router(config)#enable password class
+> Router(config)#
+> ```
+
 e.	Назначьте cisco в качестве пароля консоли и включите вход в систему по паролю.
+
+> ```
+> Router(config)#line con 0
+> Router(config-line)#pas
+> Router(config-line)#password cisco
+> Router(config-line)#login
+> Router(config-line)#
+> ```
 
 f.	Назначьте cisco в качестве пароля VTY и включите вход в систему по паролю.
 
+> ```
+> Router(config-line)#line vty 0 4
+> Router(config-line)#pas
+> Router(config-line)#password cisco
+> Router(config-line)#login
+> Router(config-line)#
+> Router(config-line)#exit
+> ```
+
 g.	Зашифруйте открытые пароли.
+
+> ```
+> Router(config)#service pa
+> Router(config)#service password-encryption 
+> Router(config)#
+> ```
 
 h.	Создайте баннер, который предупреждает о запрете несанкционированного доступа.
 
+> ```
+> Router(config)#banner motd #GET OUT!!!#
+> Router(config)#
+> ```
+
 i.	Настройте и активируйте на маршрутизаторе интерфейс G0/0/1, используя информацию, приведенную в таблице адресации.
 
+> ```
+> Router(config)#interface G0/0/1
+> Router(config-if)#ip ad
+> Router(config-if)#ip address 192.168.1.1 255.255.255.0
+> Router(config-if)#no shutdown
+> 
+> Router(config-if)#
+> %LINK-5-CHANGED: Interface GigabitEthernet0/0/1, changed state to up
+> 
+> %LINEPROTO-5-UPDOWN: Line protocol on Interface GigabitEthernet0/0/1, changed state to up
+> 
+> Router(config-if)#
+> ```
+
 j.	Сохраните текущую конфигурацию в файл загрузочной конфигурации.
+
+> А как же hostname? :) Немного посвоевольничаю и задам hostname для маршрутизатора.
+
+> ```
+> Router(config-if)#exit
+> Router(config)#hostname R1
+> R1(config)#exit
+> R1#
+> %SYS-5-CONFIG_I: Configured from console by console
+> 
+> R1#copy running-config st
+> R1#copy running-config startup-config 
+> Destination filename [startup-config]? 
+> Building configuration...
+> [OK]
+> R1#
+> ```
 
 ### Шаг 4. Настройте компьютер PC-A.
 
