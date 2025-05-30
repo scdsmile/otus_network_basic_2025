@@ -62,6 +62,25 @@ d.	Назначьте class в качестве зашифрованного п�
 > Router(config)#
 > ```
 
+> **P.S.** Тут и далее по заданию я неправильно задаю пароль на привилегированный режим.
+> 
+> Вместо **#enable password class** необходимо использовать команду **#enable secret class**
+>
+> Я не стал править изначальный вариант, чтобы сохранить свою ошибку и запомнить, что так делать не надо :)
+>
+> Однако же в моём случае необходимо сделать так:
+>
+> ```
+> S1(config)#no enable password 
+> S1(config)#enable secret class
+> ```
+>
+> Теперь пароль в конфигурации будет отображаться в зашифрованном виде:
+>
+> ```
+> enable secret 5 $1$mERr$9cTjUIEqNGurQiFU.ZeCi1
+> ```
+
 e.	Назначьте cisco в качестве пароля консоли и включите вход в систему по паролю.
 
 > ```
@@ -208,6 +227,15 @@ b.	Задайте домен для устройства.
 > R1(config)#
 > ```
 
+> **P.S.** Здесь опять та же ошибка, что и при задании пароля на привилегированный режим. Необходимо использовать **secret** вместо **password**
+> 
+> Исправляю:
+> 
+> ```
+> R1(config)#no username admin 
+> R1(config)#username admin privilege 15 secret Adm1nP@55
+> ```
+
 ### Шаг 4. Активируйте протокол SSH на линиях VTY.
 
 a.	Активируйте протоколы Telnet и SSH на входящих линиях VTY с помощью команды transport input.
@@ -292,7 +320,7 @@ j.	Сохраните текущую конфигурацию в файл заг
 > Switch(config)#no ip domain-l
 > Switch(config)#no ip domain-lookup 
 > Switch(config)#enable pa
-> Switch(config)#enable password class
+> Switch(config)#enable password class    <--- Ай-ай-ай, опять password вместо secret :)
 > Switch(config)#line vty 0 4
 > Switch(config-line)#pass
 > Switch(config-line)#password cisco
@@ -444,6 +472,14 @@ S1# ssh?
   WORD IP-адрес или имя хоста удаленной системы
 ```
 
+> В нашем случае как-то не сильно много параметров:
+> 
+> ```
+> S1#ssh ?
+>   -l  Log in using this user name
+>   -v  Specify SSH Protocol Version
+> ```
+
 ### Шаг 2. Установите с коммутатора S1 соединение с маршрутизатором R1 по протоколу SSH.
 
 a.	Чтобы подключиться к маршрутизатору R1 по протоколу SSH, введите команду –l admin. Это позволит вам войти в систему под именем admin. При появлении приглашения введите в качестве пароля Adm1nP@55
@@ -455,6 +491,16 @@ Authorized Users Only!
 R1>
 ```
 
+> ```
+> S1#ssh -l admin 192.168.1.1
+> 
+> Password: 
+> 
+> GET OUT!!!
+> 
+> R1#
+> ```
+
 b.	Чтобы вернуться к коммутатору S1, не закрывая сеанс SSH с маршрутизатором R1, нажмите комбинацию клавиш Ctrl+Shift+6. Отпустите клавиши Ctrl+Shift+6 и нажмите x. Отображается приглашение привилегированного режима EXEC коммутатора.
 
 ```
@@ -462,7 +508,18 @@ R1>
 S1#
 ```
 
-c.	Чтобы вернуться к сеансу SSH на R1, нажмите клавишу Enter в пустой строке интерфейса командной строки. Чтобы увидеть окно командной строки маршрутизатора, нажмите клавишу Enter еще раз.\
+> ```
+> S1#ssh -l admin 192.168.1.1
+> 
+> Password: 
+> 
+> GET OUT!!!
+> 
+> R1#
+> S1#
+> ```
+
+c.	Чтобы вернуться к сеансу SSH на R1, нажмите клавишу Enter в пустой строке интерфейса командной строки. Чтобы увидеть окно командной строки маршрутизатора, нажмите клавишу Enter еще раз.
 
 ```
 S1#
@@ -470,6 +527,21 @@ S1#
 
 R1>
 ```
+
+> ```
+> S1#ssh -l admin 192.168.1.1
+> 
+> Password: 
+> 
+> GET OUT!!!
+> 
+> R1#
+> S1#
+> S1#
+> [Resuming connection 1 to 192.168.1.1 ... ]
+> 
+> R1#
+> ```
 
 d.	Чтобы завершить сеанс SSH на маршрутизаторе R1, введите в командной строке маршрутизатора команду exit.
 
@@ -480,11 +552,132 @@ R1# exit
 S1#
 ```
 
+> ```
+> S1#ssh -l admin 192.168.1.1
+> 
+> Password: 
+> 
+> GET OUT!!!
+> 
+> R1#
+> S1#
+> S1#
+> [Resuming connection 1 to 192.168.1.1 ... ]
+> 
+> R1#exit
+> 
+> [Connection to 192.168.1.1 closed by foreign host]
+> S1#
+> ```
+
 > **Вопрос:** *Какие версии протокола SSH поддерживаются при использовании интерфейса командной строки?*
+
+> **Ответ:** *Проверим на коммутаторе:*
+>
+> ```
+> S1(config)#ip ssh version ?
+>   <1-2>  Protocol version
+> ```
+> 
+> Cisco IOS предлагает 2 варианта - версия 1 и версия 2.
+> 
+> Версия SSHv1 на текущий момент устарела и не отвечает требованиям безопасности, поэтому при работе с оборудованием будем выбирать SSHv2:
+> 
+> ```
+> S1(config)#ip ssh version 2
+> S1(config)#do show ip ssh
+> SSH Enabled - version 2.0
+> Authentication timeout: 120 secs; Authentication retries: 3
+> S1(config)#
+> ```
 
 
 
 ## Вопрос для повторения
 
-Как предоставить доступ к сетевому устройству нескольким пользователям, у каждого из которых есть собственное имя пользователя?
+> **Вопрос:** *Как предоставить доступ к сетевому устройству нескольким пользователям, у каждого из которых есть собственное имя пользователя?*
 
+> **Ответ:** *Для каждого пользователя нужно создать свою учетную запись с необходимыми привилегиями уровней 1-15, где 15 - привилегии администратора, 1 - привилегии пользователя (только просмотр).*
+> 
+> Например, помимо созданного ранее пользователя admin мы создадим еще пользователя operator с минимальным уровнем привилегий:
+> 
+> ```
+> R1(config)#username operator privilege 1 secret Oper123!
+> ```
+> 
+> Сравним доступный набор команд:
+> 
+> 1. Пользователь admin (уровень 15):
+> 
+> ```
+> S1#ssh -l admin 192.168.1.1
+> 
+> Password: 
+> 
+> GET OUT!!!
+> 
+> R1#?
+> Exec commands:
+>   <1-99>      Session number to resume
+>   auto        Exec level Automation
+>   clear       Reset functions
+>   clock       Manage the system clock
+>   configure   Enter configuration mode
+>   connect     Open a terminal connection
+>   copy        Copy from one file to another
+>   debug       Debugging functions (see also 'undebug')
+>   delete      Delete a file
+>   dir         List files on a filesystem
+>   disable     Turn off privileged commands
+>   disconnect  Disconnect an existing network connection
+>   enable      Turn on privileged commands
+>   erase       Erase a filesystem
+>   exit        Exit from the EXEC
+>   logout      Exit from the EXEC
+>   mkdir       Create new directory
+>   more        Display the contents of a file
+>   no          Disable debugging informations
+>   ping        Send echo messages
+>   reload      Halt and perform a cold restart
+>   resume      Resume an active network connection
+>   rmdir       Remove existing directory
+>   send        Send a message to other tty lines
+>   setup       Run the SETUP command facility
+>   show        Show running system information
+>   ssh         Open a secure shell client connection
+>   telnet      Open a telnet connection
+>   terminal    Set terminal line parameters
+>   traceroute  Trace route to destination
+>   undebug     Disable debugging functions (see also 'debug')
+>   vlan        Configure VLAN parameters
+>   write       Write running configuration to memory, network, or terminal
+> R1#
+> ```
+> 
+> 2. Пользователь operator (уровень 1):
+> 
+> ```
+> S1#ssh -l operator 192.168.1.1
+> 
+> Password: 
+> 
+> GET OUT!!!
+> 
+> R1>?
+> Exec commands:
+>   <1-99>      Session number to resume
+>   connect     Open a terminal connection
+>   disable     Turn off privileged commands
+>   disconnect  Disconnect an existing network connection
+>   enable      Turn on privileged commands
+>   exit        Exit from the EXEC
+>   logout      Exit from the EXEC
+>   ping        Send echo messages
+>   resume      Resume an active network connection
+>   show        Show running system information
+>   ssh         Open a secure shell client connection
+>   telnet      Open a telnet connection
+>   terminal    Set terminal line parameters
+>   traceroute  Trace route to destination
+> R1>
+> ```
