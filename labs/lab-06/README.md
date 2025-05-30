@@ -40,7 +40,7 @@
 
 Подключите устройства, как показано в топологии, и подсоедините необходимые кабели.
 
-> ![](https://github.com/scdsmile/otus_network_basic_2025/blob/main/labs/lab-06/img/0_topology.png?raw=true)
+![](https://github.com/scdsmile/otus_network_basic_2025/blob/main/labs/lab-06/img/0_topology.png?raw=true)
 
 ### Шаг 2. Настройте базовые параметры для маршрутизатора.
 
