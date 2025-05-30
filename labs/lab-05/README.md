@@ -139,9 +139,31 @@ a.	Настройте для PC-A IP-адрес и маску подсети.
 
 b.	Настройте для PC-A шлюз по умолчанию.
 
+> Пожалуй, не буду делать это в 2 этапа :)
+>
+> ![](https://github.com/scdsmile/otus_network_basic_2025/blob/main/labs/lab-05/img/1-4_pc_ip_settings.png?raw=true)
+
 ### Шаг 5. Проверьте подключение к сети.
 
 Пошлите с PC-A команду Ping на маршрутизатор R1. Если эхо-запрос с помощью команды ping не проходит, найдите и устраните неполадки подключения.
+
+> ```
+> C:\>ping 192.168.1.1
+> 
+> Pinging 192.168.1.1 with 32 bytes of data:
+> 
+> Reply from 192.168.1.1: bytes=32 time=12ms TTL=255
+> Reply from 192.168.1.1: bytes=32 time=1ms TTL=255
+> Reply from 192.168.1.1: bytes=32 time<1ms TTL=255
+> Reply from 192.168.1.1: bytes=32 time<1ms TTL=255
+> 
+> Ping statistics for 192.168.1.1:
+>     Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
+> Approximate round trip times in milli-seconds:
+>     Minimum = 0ms, Maximum = 12ms, Average = 3ms
+> 
+> C:\>
+> ```
 
 ## Часть 2. Настройка маршрутизатора для доступа по протоколу SSH
 
@@ -151,31 +173,89 @@ b.	Настройте для PC-A шлюз по умолчанию.
 
 При генерации ключа шифрования в качестве его части используются имя устройства и домен. Поэтому эти имена необходимо указать перед вводом команды crypto key.
 
-Откройте окно конфигурации
-
 a.	Задайте имя устройства.
+
+> Аааа, теперь понял, почему мы раньше не указали hostname) Ну ладно, он уже указан, поэтому первый этап пропустим.
 
 b.	Задайте домен для устройства.
 
+> ```
+> R1(config)#ip domain-name dom
+> R1(config)#
+> ```
+
 ### Шаг 2. Создайте ключ шифрования с указанием его длины.
+
+> ```
+> R1(config)#crypto key generate rsa
+> The name for the keys will be: R1.dom
+> Choose the size of the key modulus in the range of 360 to 2048 for your
+>   General Purpose Keys. Choosing a key modulus greater than 512 may take
+>   a few minutes.
+> 
+> How many bits in the modulus [512]: 2048
+> % Generating 2048 bit RSA keys, keys will be non-exportable...[OK]
+> 
+> R1(config)#
+> ```
 
 ### Шаг 3. Создайте имя пользователя в локальной базе учетных записей.
 
-Настройте имя пользователя, используя admin в качестве имени пользователя и Adm1nP @55 в качестве пароля.
+Настройте имя пользователя, используя admin в качестве имени пользователя и Adm1nP@55 в качестве пароля.
+
+> ```
+> R1(config)#username admin privilege 15 pass Adm1nP@55
+> R1(config)#
+> ```
 
 ### Шаг 4. Активируйте протокол SSH на линиях VTY.
 
 a.	Активируйте протоколы Telnet и SSH на входящих линиях VTY с помощью команды transport input.
 
+> ```
+> R1(config)#line vty 0 4
+> R1(config-line)#transport input ssh 
+> ```
+
 b.	Измените способ входа в систему таким образом, чтобы использовалась проверка пользователей по локальной базе учетных записей.
 
+> ```
+> R1(config-line)#login local
+> R1(config-line)#
+> ```
+
 ### Шаг 5. Сохраните текущую конфигурацию в файл загрузочной конфигурации.
+
+> ```
+> R1(config-line)#exit
+> R1(config)#exit
+> R1#
+> %SYS-5-CONFIG_I: Configured from console by console
+> 
+> R1#copy run start
+> Destination filename [startup-config]? 
+> Building configuration...
+> [OK]
+> R1#
+> ```
 
 ### Шаг 6. Установите соединение с маршрутизатором по протоколу SSH.
 
 a.	Запустите Tera Term с PC-A.
 
+> Не буду) Подключусь через командную строку.
+
 b.	Установите SSH-подключение к R1. Use the username admin and password Adm1nP@55. У вас должно получиться установить SSH-подключение к R1.
+
+> ```
+> C:\>ssh -l admin 192.168.1.1
+> 
+> Password: 
+> 
+> GET OUT!!!
+> 
+> R1#
+> ```
 
 ## Часть 3. Настройка коммутатора для доступа по протоколу SSH
 
